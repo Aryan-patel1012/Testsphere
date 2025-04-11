@@ -35,6 +35,7 @@
           <th>Total Question</th>
           <th>Total Marks</th>
           <th>Exam timer</th>
+          <th>Exam Date</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -45,6 +46,7 @@
         <td>{{t.question_number}}</td>
         <td>{{t.total_marks}}</td>
         <td>{{t.exam_timer}}</td>
+        <td>{{t.exam_date}}</td>
         
         <td class="text-center"><a class="btn btn-danger btn-xs" style="border-radius: 0%;" href="{% url 'delete-exam' t.id  %}"><span class="glyphicon glyphicon-trash"></span></a></td>
       </tr>

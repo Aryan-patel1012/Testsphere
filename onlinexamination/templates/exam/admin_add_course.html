@@ -29,10 +29,15 @@
 
       <label for="total_marks">Total Marks</label>
       {% render_field courseForm.total_marks class="form-control rounded-0" placeholder="Example: 100" %}
+
+      <label for="exam_timer">Total Time</label>
+      {% render_field courseForm.exam_timer class="form-control form-control-sm rounded-0" placeholder="Example: 10 Min" %}   
+
     </div>
     
 
-    <button type="submit" class="btn btn-primary rounded-0">Add Course Info</button>
+    <!-- <button type="submit" class="btn btn-primary rounded-0">Add Course Info</button> -->
+    <button type="submit" class="btn btn-primary btn-lg rounded-0" style="border-radius: 0%;">Submit Info</button>
   </form>
 <br><br><br>
 {% endblock content %}

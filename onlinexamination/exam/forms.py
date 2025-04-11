@@ -13,7 +13,7 @@ class TeacherSalaryForm(forms.Form):
 class CourseForm(forms.ModelForm):
     class Meta:
         model=models.Course
-        fields=['course_name','question_number','total_marks','exam_timer']
+        fields=['course_name','question_number','total_marks','exam_timer' ]
 
 class QuestionForm(forms.ModelForm):
     

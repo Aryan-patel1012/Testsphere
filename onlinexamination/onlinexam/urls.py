@@ -2,6 +2,7 @@ from django.urls import path,include
 from django.contrib import admin
 from exam import views
 from django.contrib.auth.views import LogoutView,LoginView
+from django.views.decorators.csrf import csrf_exempt
 urlpatterns = [
    
     path('admin/', admin.site.urls),
@@ -11,7 +12,8 @@ urlpatterns = [
 
 
     path('',views.home_view,name=''),
-    path('logout', LogoutView.as_view(template_name='exam/logout.html'),name='logout'),
+    # path('logout', LogoutView.as_view(template_name='exam/logout.html'),name='logout'),
+    path('logout/', csrf_exempt(LogoutView.as_view(template_name='exam/logout.html')), name='logout'),
     path('contactus', views.contactus_view),
     path('afterlogin', views.afterlogin_view,name='afterlogin'),
 

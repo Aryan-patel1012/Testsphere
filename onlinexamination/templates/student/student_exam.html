@@ -32,6 +32,7 @@
         <tr>
 
           <th>Exam Name</th>
+          <th>Exam Time</th>
           
           <th>Action</th>
         </tr>
@@ -40,6 +41,7 @@
       <tr>
 
         <td> {{t.course_name}}</td>
+        <td> {{t.exam_date}}</td>
         
         <td class="text-center"><a class="btn btn-primary btn-sm" style="border-radius:0px;" href="{% url 'take-exam' t.id  %}"><span class="glyphicon glyphicon-check"></span> Attend Exam</a></td>
       </tr>

@@ -1,5 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth.models import User
+
+# class ExamSchedule(models.Model):
+#     course_name = models.CharField(max_length=255)
+#     question_number = models.IntegerField()
+#     total_marks = models.IntegerField()
+#     exam_timer = models.CharField(max_length=50)  # Keeping it as CharField if it's in minutes
+#     exam_scheduler = models.DateTimeField()  # This should be DateTimeField
 
 class Teacher(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE)

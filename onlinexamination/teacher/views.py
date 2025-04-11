@@ -1,4 +1,5 @@
 from django.shortcuts import render,redirect
+import pytz
 from . import forms,models
 from django.db.models import Sum
 from django.contrib.auth.models import Group
@@ -10,8 +11,22 @@ from exam import models as QMODEL
 from student import models as SMODEL
 from exam import forms as QFORM
 from django.urls import reverse
+from django.utils.timezone import make_aware , is_naive
+from .forms import ExamScheduleForm
 
 
+
+def schedule_exam(request):
+    if request.method == "POST":
+        form = ExamScheduleForm(request.POST)
+        if form.is_valid():
+            exam = form.save(commit=False)
+            exam.teacher = request.user  # Assign logged-in teacher
+            exam.save()
+            return redirect('exam_list')  # Redirect to a page listing scheduled exams
+    else:
+        form = ExamScheduleForm()
+    return render(request, 'schedule_exam.html', {'form': form})
 #for showing signup/login button for teacher
 def teacherclick_view(request):
     if request.user.is_authenticated:
@@ -61,16 +76,96 @@ def teacher_exam_view(request):
 
 @login_required(login_url='teacherlogin')
 @user_passes_test(is_teacher)
+# def teacher_add_exam_view(request):
+#     courseForm=ExamScheduleForm()
+#     if request.method=='POST':
+#         courseForm=ExamScheduleForm(request.POST)
+#         if courseForm.is_valid():        
+#             courseForm.save()
+#         else:
+#             print(courseForm.errors)
+#         return HttpResponseRedirect('/teacher/teacher-view-exam')
+#     return render(request,'teacher/teacher_add_exam.html',{'courseForm':courseForm})
+
+
+# def teacher_add_exam_view(request):
+#     courseForm = ExamScheduleForm()
+#     if request.method == 'POST':
+#         courseForm = ExamScheduleForm(request.POST)
+#         if courseForm.is_valid():
+#             # Extract the exam date from the form
+#             exam_date = courseForm.cleaned_data['exam_date']
+            
+#             # Check if the datetime is naive or aware
+#             if exam_date.tzinfo is None:
+#                 # If naive, localize to IST
+#                 ist = pytz.timezone('Asia/Kolkata')
+#                 exam_date_ist = ist.localize(exam_date)
+#             else:
+#                 # If aware, just use it as is
+#                 exam_date_ist = exam_date
+            
+#             # Convert IST to UTC
+#             exam_date_utc = exam_date_ist.astimezone(pytz.utc)
+            
+#             # Save the course with the corrected UTC datetime
+#             course = courseForm.save(commit=False)
+#             course.exam_date = exam_date_utc
+#             course.save()
+            
+#             return HttpResponseRedirect('/teacher/teacher-view-exam')
+#         else:
+#             print(courseForm.errors)
+#     return render(request, 'teacher/teacher_add_exam.html', {'courseForm': courseForm})
+
+# def teacher_add_exam_view(request):
+#     courseForm = ExamScheduleForm()
+#     if request.method == 'POST':
+#         courseForm = ExamScheduleForm(request.POST)
+#         if courseForm.is_valid():
+#             # Extract the exam date from the form
+#             exam_date = courseForm.cleaned_data['exam_date']
+            
+#             # Localize to IST if the datetime is naive
+#             ist = pytz.timezone('Asia/Kolkata')
+#             if exam_date.tzinfo is None:
+#                 # If naive, localize to IST
+#                 exam_date_ist = ist.localize(exam_date)
+#             else:
+#                 # If aware, just use it as is
+#                 exam_date_ist = exam_date
+            
+#             # Save the course with the IST datetime
+#             course = courseForm.save(commit=False)
+#             print(exam_date_ist)
+#             course.exam_date = exam_date_ist  # Store as IST
+#             course.save()
+            
+#             return HttpResponseRedirect('/teacher/teacher-view-exam')
+#         else:
+#             print(courseForm.errors)
+#     return render(request, 'teacher/teacher_add_exam.html', {'courseForm': courseForm})
+
 def teacher_add_exam_view(request):
-    courseForm=QFORM.CourseForm()
-    if request.method=='POST':
-        courseForm=QFORM.CourseForm(request.POST)
-        if courseForm.is_valid():        
-            courseForm.save()
-        else:
-            print("form is invalid")
-        return HttpResponseRedirect('/teacher/teacher-view-exam')
-    return render(request,'teacher/teacher_add_exam.html',{'courseForm':courseForm})
+    if request.method == 'POST':
+        courseForm = ExamScheduleForm(request.POST)
+        if courseForm.is_valid():
+            exam_instance = courseForm.save(commit=False)
+ 
+            # Define IST timezone
+            ist = pytz.timezone('Asia/Kolkata')
+ 
+            # Ensure datetime is in IST
+            if is_naive(exam_instance.exam_date):
+                exam_instance.exam_date = make_aware(exam_instance.exam_date, timezone=ist)
+ 
+            exam_instance.save()
+            return HttpResponseRedirect('/teacher/teacher-view-exam')
+ 
+    else:
+        courseForm = ExamScheduleForm()
+ 
+    return render(request, 'teacher/teacher_add_exam.html', {'courseForm': courseForm})
 
 @login_required(login_url='teacherlogin')
 @user_passes_test(is_teacher)

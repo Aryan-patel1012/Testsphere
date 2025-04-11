@@ -180,7 +180,11 @@
       <h3>Online Exam</h3>
     </div>
     <div class="right_area">
-      <a href="/logout" class="logout_btn" style="border-radius:0px;">Logout</a>
+      <!-- <a href="/logout" class="logout_btn" style="border-radius:0px;">Logout</a> -->
+      <form action="{% url 'logout' %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="logout_btn">Logout</button>
+    </form>
     </div>
   </header>
   <!--header area end-->
