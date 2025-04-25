@@ -17,6 +17,8 @@ from django.utils.timezone import now, localtime
 from django.contrib import messages
 import pytz
 from django.utils import timezone
+from django.core.mail import send_mail
+from django.contrib.auth.models import User
 
 
 #for showing signup/login button for student
@@ -171,46 +173,98 @@ def start_exam_view(request, pk):
         messages.error(request, "❌ Exam is not available now")
         return redirect('student-dashboard')
 # @csrf_protect
+
 @csrf_exempt
 def calculate_marks_view(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('login')
- 
+
     course_id = request.COOKIES.get('course_id')
     if not course_id:
         return HttpResponse("Course ID not found in cookies.")
- 
+
     try:
         course = QMODEL.Course.objects.get(id=course_id)
     except QMODEL.Course.DoesNotExist:
         return HttpResponse("Invalid course ID.")
- 
+
     total_marks = 0
     questions = QMODEL.Question.objects.filter(course=course)
- 
+
     for i, question in enumerate(questions, start=1):
-        selected_ans = request.COOKIES.get(str(i))  # Get answer from cookies
- 
-        if not selected_ans:  # ✅ Check if empty or None
-            print(f"Question {i} was not attempted.")  
-            continue  # Skip to next question (counts as wrong)
- 
+        selected_ans = request.COOKIES.get(str(i))
+        if not selected_ans:
+            continue
         if selected_ans == question.answer:
-            total_marks += question.marks  # ✅ Only count correct answers
- 
+            total_marks += question.marks
+
     student = models.Student.objects.filter(user_id=request.user.id).first()
     if not student:
         return HttpResponse("You are not registered as a student.")
- 
+
     result = QMODEL.Result(
-        marks=total_marks, 
-        exam=course, 
+        marks=total_marks,
+        exam=course,
         student=student,
-        date=timezone.now()  # ✅ Ensure date is set before saving
+        date=timezone.now()
     )
     result.save()
- 
+    
+
+    # ✅ Send result email
+    user_email = student.email or request.user.email
+    if user_email:
+        send_mail(
+            subject="Your TestSphere Exam Result",
+            message=f"Hi {student.user.first_name},\n\nYou scored {total_marks} marks in the exam: {course.course_name}.\n\nGood luck!\nTestSphere Team",
+            from_email='aryanpatel6966@gmail.com',  # use the email from settings.py
+            recipient_list=[user_email],
+            fail_silently=False
+        )
+
     return HttpResponseRedirect('view-result')
+
+
+# @csrf_exempt
+# def calculate_marks_view(request):
+#     if not request.user.is_authenticated:
+#         return HttpResponseRedirect('login')
+ 
+#     course_id = request.COOKIES.get('course_id')
+#     if not course_id:
+#         return HttpResponse("Course ID not found in cookies.")
+ 
+#     try:
+#         course = QMODEL.Course.objects.get(id=course_id)
+#     except QMODEL.Course.DoesNotExist:
+#         return HttpResponse("Invalid course ID.")
+ 
+#     total_marks = 0
+#     questions = QMODEL.Question.objects.filter(course=course)
+ 
+#     for i, question in enumerate(questions, start=1):
+#         selected_ans = request.COOKIES.get(str(i))  # Get answer from cookies
+ 
+#         if not selected_ans:  # ✅ Check if empty or None
+#             print(f"Question {i} was not attempted.")  
+#             continue  # Skip to next question (counts as wrong)
+ 
+#         if selected_ans == question.answer:
+#             total_marks += question.marks  # ✅ Only count correct answers
+ 
+#     student = models.Student.objects.filter(user_id=request.user.id).first()
+#     if not student:
+#         return HttpResponse("You are not registered as a student.")
+ 
+#     result = QMODEL.Result(
+#         marks=total_marks, 
+#         exam=course, 
+#         student=student,
+#         date=timezone.now()  # ✅ Ensure date is set before saving
+#     )
+#     result.save()
+ 
+#     return HttpResponseRedirect('view-result')
 
 
 

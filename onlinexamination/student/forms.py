@@ -4,9 +4,10 @@ from . import models
 from exam import models as QMODEL
 
 class StudentUserForm(forms.ModelForm):
+    email = forms.EmailField(required=True)
     class Meta:
         model=User
-        fields=['first_name','last_name','username','password']
+        fields=['first_name','last_name','username','email','password']
         widgets = {
         'password': forms.PasswordInput()
         }
@@ -14,5 +15,6 @@ class StudentUserForm(forms.ModelForm):
 class StudentForm(forms.ModelForm):
     class Meta:
         model=models.Student
-        fields=['address','mobile','profile_pic']
+        fields=['email','mobile','profile_pic']
+
 

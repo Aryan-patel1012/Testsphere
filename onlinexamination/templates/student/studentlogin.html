@@ -71,7 +71,8 @@
                      {% render_field form.password class="form-control rounded-0" autocomplete="off" placeholder="Password" %}
 
                      <input type="submit" class="btn btn-primary btn-lg rounded-0" name="" value="Login">
-
+                    <p><a href="{% url 'password_reset' %}">Forgot Password?</a>
+                    </p>
                 </form>
             </div>
         </div>
